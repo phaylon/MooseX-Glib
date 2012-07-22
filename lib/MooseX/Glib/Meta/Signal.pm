@@ -69,4 +69,4 @@ method as_signal_spec {
     };
 };
 
-1;
+__PACKAGE__->meta->make_immutable;

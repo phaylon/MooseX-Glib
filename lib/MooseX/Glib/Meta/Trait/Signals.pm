@@ -39,11 +39,19 @@ has signal_overrides => (
 
 method signal_metaclass { 'MooseX::Glib::Meta::Signal' }
 
-method add_signal ($name, %arg) {
-    my $signal = use_module($self->signal_metaclass)
-        ->new(%arg, name => $name);
-    $self->_set_signal($signal);
-    return $signal;
+method add_signal (@args) {
+    if (@args == 1 and ref $args[0]) {
+        my $signal = $args[0];
+        $self->_set_signal($signal->name, $signal);
+        return $signal;
+    }
+    else {
+        my ($name, %arg) = @args;
+        my $signal = use_module($self->signal_metaclass)
+            ->new(%arg, name => $name);
+        $self->_set_signal($name, $signal);
+        return $signal;
+    }
 }
 
 method get_signal_spec {

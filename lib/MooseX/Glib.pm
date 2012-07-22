@@ -5,7 +5,7 @@ package MooseX::Glib;
 use Moose ();
 use Moose::Exporter;
 
-my $_trait_subclass = 'MooseX::Glib::Meta::Class::Trait::SubClass';
+my $_trait = 'MooseX::Glib::Meta::Trait::Class';
 
 use syntax qw( simple/v2 );
 use namespace::clean;
@@ -17,7 +17,7 @@ method init_meta ($class: %arg) {
     my $meta = Moose::Util::MetaRole::apply_metaroles(
         for             => $arg{for_class},
         class_metaroles => {
-            class => [$_trait_subclass],
+            class => [$_trait],
         },
     );
     extends $meta, 'Glib::Object';
@@ -25,8 +25,8 @@ method init_meta ($class: %arg) {
 }
 
 Moose::Exporter->setup_import_methods(
-    with_meta       => [qw( reify signal extends )],
-    also            => 'Moose',
+    with_meta   => [qw( reify signal extends )],
+    also        => 'Moose',
 );
 
 1;

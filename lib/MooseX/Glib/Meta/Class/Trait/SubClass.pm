@@ -77,8 +77,4 @@ before make_mutable {
     !, $self->name if $self->is_reified;
 }
 
-with qw(
-    MooseX::Glib::Meta::Trait::Signals
-);
-
 1;
