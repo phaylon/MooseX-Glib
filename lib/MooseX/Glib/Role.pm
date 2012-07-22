@@ -1,11 +1,11 @@
 use strictures 1;
 
-package MooseX::Glib;
+package MooseX::Glib::Role;
 
 use Moose ();
 use Moose::Exporter;
 
-my $_trait_subclass = 'MooseX::Glib::Meta::Class::Trait::SubClass';
+#my $_trait_subclass = 'MooseX::Glib::Meta::Class::Trait::SubClass';
 
 use syntax qw( simple/v2 );
 use namespace::clean;
@@ -25,7 +25,7 @@ method init_meta ($class: %arg) {
 }
 
 Moose::Exporter->setup_import_methods(
-    with_meta       => [qw( reify signal extends )],
+    with_meta       => [qw( signal )],
     also            => 'Moose',
 );
 
