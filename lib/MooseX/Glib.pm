@@ -5,7 +5,8 @@ package MooseX::Glib;
 use Moose ();
 use Moose::Exporter;
 
-my $_trait = 'MooseX::Glib::Meta::Trait::Class';
+my $_trait       = 'MooseX::Glib::Meta::Trait::Class';
+my $_constructor = 'MooseX::Glib::Meta::Method::Constructor';
 
 use syntax qw( simple/v2 );
 use namespace::clean;
@@ -17,7 +18,8 @@ method init_meta ($class: %arg) {
     my $meta = Moose::Util::MetaRole::apply_metaroles(
         for             => $arg{for_class},
         class_metaroles => {
-            class => [$_trait],
+            class       => [$_trait],
+            constructor => [$_constructor],
         },
     );
     extends $meta, 'Glib::Object';

@@ -1,5 +1,7 @@
 use strictures 1;
 
+# ABSTRACT: Types used by MooseX::Glib
+
 package MooseX::Glib::Types;
 
 use MooseX::Types::Moose qw( :all );

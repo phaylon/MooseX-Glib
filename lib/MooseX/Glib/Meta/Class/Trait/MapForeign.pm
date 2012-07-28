@@ -4,8 +4,9 @@ package MooseX::Glib::Meta::Class::Trait::MapForeign;
 use Moose::Role;
 use Moose::Util qw( with_traits does_role );
 
+use MooseX::Glib::Util  qw( map_type_constraint );
 use Glib;
-use Carp qw( confess );
+use Carp                qw( confess );
 
 use syntax qw( simple/v2 ql );
 use namespace::autoclean;
@@ -26,9 +27,11 @@ method map_from_glib ($class) {
 method _map_glib_attributes ($class) {
     for my $glib_attr ($class->list_properties) {
         my $flags = $glib_attr->{flags};
+        my $type  = $glib_attr->{type};
         $self->add_attribute(
             $_attr_foreign->new(
                 $glib_attr->{name}->$_perlify,
+                isa             => map_type_constraint($type),
                 is              => ($flags * 'writable') ? 'rw' : 'ro',
                 glib_flags      => $flags,
                 glib_type       => $glib_attr->{type},
@@ -108,39 +111,12 @@ before make_immutable {
         BUILDARGS
         BUILDALL
     );
-    if (my $demolish = $self->name->can('DEMOLISH')) {
+    if (my $demolish = $self->get_method('DEMOLISH')) {
         $self->add_method(FINALIZE_INSTANCE => $demolish);
     }
     $self->add_method($_->[0] => $self->_make_property_access($_->[1]))
-        for [GET_PROPERTY => 'read'], [SET_PROPERTY => 'write'];
-    my %foreign = map {
-        ($_->name => 1);
-    } $self->get_all_foreign_attributes;
-    my $split_params = method ($class: $params) {
-        my (%glib, %moose);
-        ${ $foreign{$_} ? \%glib : \%moose }{$_} = $params->{$_}
-            for keys %$params;
-        return \%glib, \%moose;
-    };
-    $self->add_method(new => method ($class: @args) {
-        confess sprintf ql!
-            Constructor 'new' can not be called on instance '%s'
-        !, $class if ref $class;
-        my $params = $class->BUILDARGS(@args);
-        my ($glib_args, $moose_args)
-            = $class->$split_params($params);
-        my $object = Glib::Object::new($class, %$glib_args);
-        $object->tie_properties(1);
-        delete $object->{$_}
-            for grep not($foreign{$_}),
-                grep not(defined $object->{$_}),
-                keys %$object;
-        $class->meta->new_object({
-            %$params,
-            __INSTANCE__ => $object,
-        });
-        return $object;
-    });
+        for [GET_PROPERTY => 'read'],
+            [SET_PROPERTY => 'write'];
     return 1;
 }
 

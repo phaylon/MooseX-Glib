@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strictures 1;
 use Gtk3 -init;
 
@@ -22,6 +23,8 @@ do {
     use MooseX::Glib::Role;
 
     signal quit => ();
+
+    sub do_quit { exit }
 
     sub quit { $_[0]->signal_emit('quit') }
 };
@@ -49,6 +52,7 @@ do {
     sub BUILD {
         my ($self) = @_;
         $self->add($self->button);
+        $self->button->show;
     }
 
     with qw(
@@ -62,7 +66,7 @@ do {
 my $window = Demo::Window->new(
     title => 'Hello World',
 );
-$window->signal_connect(quit => sub { exit });
-$window->show_all;
+$window->signal_connect(destroy => sub { $_[0]->quit });
+$window->show;
 
 Gtk3::main;

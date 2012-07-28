@@ -64,8 +64,9 @@ method reify {
 around make_immutable (%option) {
     return $self->$orig(
         inline_accessors    => 1,
-        inline_constructor  => 0,
+        inline_constructor  => 1,
         inline_destructor   => 0,
+        replace_constructor => 1,
         %option,
     );
 }

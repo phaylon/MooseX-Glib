@@ -4,6 +4,7 @@ package MooseX::Glib::DSL;
 
 use Carp                qw( confess );
 use MooseX::Glib::Util  qw( :all );
+use Class::Load         qw( load_class );
 
 use syntax qw( simple/v2 ql );
 use namespace::clean;
@@ -33,6 +34,10 @@ fun extends ($meta, @superclasses) {
         Class '%s' has more than one superclass, but multiple
         inheritance is not supported by MooseX::Glib
     !, $meta->name if @superclasses > 1;
+    confess sprintf ql!
+        Class '%s' called 'extends' without any class arguments
+    !, $meta->name unless @superclasses;
+    load_class($superclasses[0]);
     $meta->superclasses(moosified $superclasses[0]);
     return 1;
 }
